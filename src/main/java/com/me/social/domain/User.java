@@ -65,4 +65,7 @@ public class User {
     @Column(nullable = false)
     private Instant createdAt;
 
+    @Column(nullable = false)
+    private boolean deleted;
+
 }

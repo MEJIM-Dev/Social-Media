@@ -23,4 +23,7 @@ public class Comment {
 
     @Column(nullable = false)
     private Instant creationDate;
+
+    @Column(nullable = false)
+    private boolean deleted;
 }
