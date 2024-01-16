@@ -1,5 +1,5 @@
 server:
-  port: 0
+  port: 8069
 
 spring:
   datasource:
@@ -9,4 +9,10 @@ spring:
   jpa:
     hibernate.ddl-auto: update
     show-sql: true
+
+app:
+  users:
+    maxPageSize: 100
+  posts:
+    maxPageSize: 50
 
