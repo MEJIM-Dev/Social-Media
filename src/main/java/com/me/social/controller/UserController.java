@@ -1,10 +1,12 @@
 package com.me.social.controller;
 
 import com.me.social.config.ApplicationUrl;
+import com.me.social.dto.domain.UserDTO;
 import com.me.social.dto.request.RegistrationDTO;
 import com.me.social.dto.request.UserUpdateRequestDTO;
 import com.me.social.dto.response.DefaultApiResponse;
 import com.me.social.service.UserService;
+import com.me.social.util.UserUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    private final UserUtil userUtil;
 
     @GetMapping(ApplicationUrl.USERS)
     public DefaultApiResponse<?> getUsers(Pageable pageable){
@@ -34,13 +38,15 @@ public class UserController {
     @PutMapping(ApplicationUrl.USER)
     public DefaultApiResponse<?> updateInformation(@Valid @RequestBody UserUpdateRequestDTO requestDTO,@PathVariable Long id){
         log.info("[+] Inside UserController.updateInformation with dto: {}, id: {}",requestDTO, id);
-        return userService.updateInformation(requestDTO,id);
+        UserDTO loggedInUser = userUtil.getLoggedInUserProfile();
+        return userService.updateInformation(requestDTO,id,loggedInUser.getId());
     }
 
     @DeleteMapping(ApplicationUrl.USER)
     public DefaultApiResponse<?> deactivate(@PathVariable Long id){
         log.info("[+] Inside UserController.deactivate id: {}", id);
-        return userService.deactivate(id);
+        UserDTO loggedInUser = userUtil.getLoggedInUserProfile();
+        return userService.deactivate(id,loggedInUser.getId());
     }
 
 }

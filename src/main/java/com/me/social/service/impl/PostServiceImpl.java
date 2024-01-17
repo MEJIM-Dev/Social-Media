@@ -45,13 +45,20 @@ public class PostServiceImpl implements PostService {
         apiResponse.setStatus(ExtendedConstants.ResponseCode.FAIL.getStatus());
         apiResponse.setMessage(ExtendedConstants.ResponseCode.FAIL.getMessage());
         try {
+            Optional<User> optionalUser = userRepository.findByIdAndDeleted(postDto.getUserId(), false);
+            if(optionalUser.isEmpty()){
+                apiResponse.setStatus(ExtendedConstants.ResponseCode.INVALID_USER.getStatus());
+                apiResponse.setMessage(ExtendedConstants.ResponseCode.INVALID_USER.getMessage());
+                return apiResponse;
+            }
+
             Post post = new Post();
             post.setContent(postDto.getContent());
             post.setCreationDate(Instant.now());
             post.setLikesCount(0);
-            //Get Logged in user
-            //Add to Post
+            post.setUser(optionalUser.get());
             postRepository.save(post);
+
             apiResponse.setStatus(ExtendedConstants.ResponseCode.SUCCESS.getStatus());
             apiResponse.setMessage(ExtendedConstants.ResponseCode.SUCCESS.getMessage());
         } catch (Exception e){
@@ -159,6 +166,12 @@ public class PostServiceImpl implements PostService {
             }
 
             Post post = optionalPost.get();
+            if(post.getUser()==null || post.getUser().getId()!=updateDTO.getUserId()){
+                apiResponse.setStatus(ExtendedConstants.ResponseCode.INVALID_USER.getStatus());
+                apiResponse.setMessage(ExtendedConstants.ResponseCode.INVALID_USER.getMessage());
+                return apiResponse;
+            }
+
             post.setContent(updateDTO.getContent());
             postRepository.save(post);
 
@@ -171,7 +184,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public DefaultApiResponse<?> remove(Long id) {
+    public DefaultApiResponse<?> remove(Long id, long loggedInUserProfileId) {
         var apiResponse = new DefaultApiResponse<>();
         apiResponse.setStatus(ExtendedConstants.ResponseCode.FAIL.getStatus());
         apiResponse.setMessage(ExtendedConstants.ResponseCode.FAIL.getMessage());
@@ -184,6 +197,13 @@ public class PostServiceImpl implements PostService {
             }
 
             Post post = optionalPost.get();
+
+            if(post.getUser()==null || post.getUser().getId()!=loggedInUserProfileId){
+                apiResponse.setStatus(ExtendedConstants.ResponseCode.INVALID_USER.getStatus());
+                apiResponse.setMessage(ExtendedConstants.ResponseCode.INVALID_USER.getMessage());
+                return apiResponse;
+            }
+
             post.setDeleted(true);
             postRepository.save(post);
 

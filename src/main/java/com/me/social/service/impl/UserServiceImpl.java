@@ -2,7 +2,6 @@ package com.me.social.service.impl;
 
 import com.me.social.config.ExtendedConstants;
 import com.me.social.domain.User;
-import com.me.social.dto.request.RegistrationDTO;
 import com.me.social.dto.request.UserUpdateRequestDTO;
 import com.me.social.dto.response.DefaultApiResponse;
 import com.me.social.dto.response.UserResponseDTO;
@@ -86,16 +85,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public DefaultApiResponse<?> updateInformation(UserUpdateRequestDTO requestDTO, Long id) {
+    public DefaultApiResponse<?> updateInformation(UserUpdateRequestDTO requestDTO, Long id, long loggedInUserId) {
         DefaultApiResponse<Object> apiResponse = new DefaultApiResponse<>();
         apiResponse.setStatus(ExtendedConstants.ResponseCode.FAIL.getStatus());
         apiResponse.setMessage(ExtendedConstants.ResponseCode.FAIL.getMessage());
         try {
+            if(id!=loggedInUserId){
+                apiResponse.setStatus(ExtendedConstants.ResponseCode.INVALID_USER.getStatus());
+                apiResponse.setMessage(ExtendedConstants.ResponseCode.INVALID_USER.getMessage());
+                return apiResponse;
+            }
+
             Optional<User> optionalUser = userRepository.findByIdAndDeleted(id,false);
             if(optionalUser.isEmpty()){
                 apiResponse.setStatus(ExtendedConstants.ResponseCode.NOT_FOUND.getStatus());
                 apiResponse.setMessage(ExtendedConstants.ResponseCode.NOT_FOUND.getMessage());
                 return apiResponse;
+            }
+
+            Optional<User> existingUser = userRepository.findByEmail(requestDTO.getEmail());
+            if(existingUser.isPresent()){
+                User user = existingUser.get();
+                if(user.getId()!=loggedInUserId){
+                    apiResponse.setStatus(ExtendedConstants.ResponseCode.ALREADY_IN_USE.getStatus());
+                    apiResponse.setMessage(String.format(ExtendedConstants.ResponseCode.ALREADY_IN_USE.getMessage(),"Email"));
+                    return apiResponse;
+                }
             }
 
             User user = optionalUser.get();
@@ -111,11 +126,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public DefaultApiResponse<?> deactivate(Long id) {
+    public DefaultApiResponse<?> deactivate(Long id, long loggedInUserId) {
         DefaultApiResponse<Object> apiResponse = new DefaultApiResponse<>();
         apiResponse.setStatus(ExtendedConstants.ResponseCode.FAIL.getStatus());
         apiResponse.setMessage(ExtendedConstants.ResponseCode.FAIL.getMessage());
         try {
+            if(id!=loggedInUserId){
+                apiResponse.setStatus(ExtendedConstants.ResponseCode.INVALID_USER.getStatus());
+                apiResponse.setMessage(ExtendedConstants.ResponseCode.INVALID_USER.getMessage());
+                return apiResponse;
+            }
+
             Optional<User> optionalUser = userRepository.findByIdAndDeleted(id,false);
             if(optionalUser.isEmpty()){
                 apiResponse.setStatus(ExtendedConstants.ResponseCode.NOT_FOUND.getStatus());

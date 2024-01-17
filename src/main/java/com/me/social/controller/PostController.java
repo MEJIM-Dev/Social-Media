@@ -1,10 +1,12 @@
 package com.me.social.controller;
 
 import com.me.social.config.ApplicationUrl;
+import com.me.social.dto.domain.UserDTO;
 import com.me.social.dto.request.CreatePostDTO;
 import com.me.social.dto.request.PostUpdateDTO;
 import com.me.social.dto.response.DefaultApiResponse;
 import com.me.social.service.PostService;
+import com.me.social.util.UserUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +20,13 @@ public class PostController {
 
     private final PostService postService;
 
+    private final UserUtil userUtil;
+
     @PostMapping(ApplicationUrl.POSTS)
     public DefaultApiResponse<?> create(CreatePostDTO postDto){
         log.debug("[+] Inside PostController.create with dto: {}",postDto);
+        UserDTO loggedInUserProfile = userUtil.getLoggedInUserProfile();
+        postDto.setUserId(loggedInUserProfile.getId());
         return postService.create(postDto);
     }
 
@@ -37,20 +43,24 @@ public class PostController {
     }
 
     @GetMapping(ApplicationUrl.USER_POSTS)
-    public DefaultApiResponse<?> getUserPosts(@PathVariable Long userId,Pageable pageable){
-        log.debug("[+] Inside PostController.getUserPosts with userId: {}, with page: {}",userId,pageable);
-        return postService.getUserPosts(userId,pageable);
+    public DefaultApiResponse<?> getUserPosts(Pageable pageable){
+        log.debug("[+] Inside PostController.getUserPosts with page: {}",pageable);
+        UserDTO loggedInUserProfile = userUtil.getLoggedInUserProfile();
+        return postService.getUserPosts(loggedInUserProfile.getId(),pageable);
     }
 
     @PutMapping(ApplicationUrl.POST)
     public DefaultApiResponse<?> update(@PathVariable Long id, PostUpdateDTO updateDTO){
         log.debug("[+] Inside PostController.update with id: {}, with dto: {}",id,updateDTO);
+        UserDTO loggedInUserProfile = userUtil.getLoggedInUserProfile();
+        updateDTO.setUserId(loggedInUserProfile.getId());
         return postService.update(id,updateDTO);
     }
 
     @DeleteMapping(ApplicationUrl.POST)
     public DefaultApiResponse<?> remove(@PathVariable Long id){
         log.debug("[+] Inside PostController.remove with id: {}",id);
-        return postService.remove(id);
+        UserDTO loggedInUserProfile = userUtil.getLoggedInUserProfile();
+        return postService.remove(id,loggedInUserProfile.getId());
     }
 }

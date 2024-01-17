@@ -1,18 +1,29 @@
 package com.me.social.util;
 
+import com.google.gson.Gson;
+import com.me.social.config.ExtendedConstants;
 import com.me.social.domain.User;
+import com.me.social.dto.domain.UserDTO;
 import com.me.social.dto.request.RegistrationDTO;
 import com.me.social.dto.response.UserResponseDTO;
+import com.me.social.dto.security.JwtDecodedDTO;
+import com.me.social.exception.AppUserException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
+import org.apache.commons.codec.binary.Base64;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserUtil {
 
     private final PasswordEncoder passwordEncoder;
@@ -50,11 +61,41 @@ public class UserUtil {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("email", user.getEmail());
         extraClaims.put("sex", user.getSex());
-        extraClaims.put("firstname", user.getFirstName());
-        extraClaims.put("lastname", user.getLastName());
+        extraClaims.put("firstName", user.getFirstName());
+        extraClaims.put("lastName", user.getLastName());
         extraClaims.put("otherNames", user.getOtherNames());
         extraClaims.put("username", user.getUsername());
         extraClaims.put("profilePicture", user.getProfilePicture());
+        extraClaims.put("id", user.getId());
         return extraClaims;
+    }
+    
+    public UserDTO getLoggedInUserProfile() {
+        Optional<String> currentUserJWT = SecurityUtil.getCurrentUserJWT();
+        if (currentUserJWT.isEmpty()) {
+            throw new AppUserException(ExtendedConstants.ResponseCode.UNAUTHORIZED.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+        return getUserDtoFromToken(currentUserJWT.get());
+    }
+
+    private UserDTO getUserDtoFromToken(String jwtToken) {
+        log.info("getLoggedInUserProfile {}", jwtToken);
+        Base64 base64Url = new Base64(true);
+        String[] split_string = jwtToken.split("\\.");
+        String base64EncodedHeader = split_string[0];
+        String base64EncodedBody = split_string[1];
+        String base64EncodedSignature = split_string[2];
+        String body = new String(base64Url.decode(base64EncodedBody));
+        JwtDecodedDTO jwtDecodeDto = new Gson().fromJson(body, JwtDecodedDTO.class);
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(jwtDecodeDto.getId());
+        userDTO.setEmail(jwtDecodeDto.getEmail());
+        userDTO.setFirstName(jwtDecodeDto.getFirstName());
+        userDTO.setLastName(jwtDecodeDto.getLastName());
+        userDTO.setSex(jwtDecodeDto.getSex());
+        userDTO.setProfilePicture(jwtDecodeDto.getProfilePicture());
+        userDTO.setOtherNames(jwtDecodeDto.getOtherNames());
+        userDTO.setUsername(jwtDecodeDto.getUsername());
+        return userDTO;
     }
 }

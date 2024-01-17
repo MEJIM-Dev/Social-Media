@@ -11,8 +11,6 @@ import lombok.ToString;
 @Setter
 @ToString
 public class UserUpdateRequestDTO {
-    @NotBlank
-    private String username;
     @NotNull
     @Email
     private String email;
@@ -20,7 +18,6 @@ public class UserUpdateRequestDTO {
     private String firstName;
     @NotBlank
     private String lastName;
-    @NotBlank
     private String otherNames;
     @NotNull
     private String profilePicture;
