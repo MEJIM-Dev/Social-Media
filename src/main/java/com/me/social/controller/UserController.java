@@ -19,12 +19,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping(ApplicationUrl.REGISTRATION)
-    public DefaultApiResponse<?> registration(@Valid @RequestBody RegistrationDTO registrationDTO){
-        log.info("[+] Inside UserController.registration with dto: {}",registrationDTO);
-        return userService.registration(registrationDTO);
-    }
-
     @GetMapping(ApplicationUrl.USERS)
     public DefaultApiResponse<?> getUsers(Pageable pageable){
         log.info("[+] Inside UserController.getUsers with page: {}",pageable);
