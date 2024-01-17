@@ -49,7 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
             boolean validJwt = jwtService.validateJwt(bearerToken,user);
 
             if(validJwt) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(),null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getUsername(),bearerToken, List.of(new SimpleGrantedAuthority("ROLE_USER")));
                 authenticationToken.setDetails(request);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }

@@ -8,7 +8,7 @@ public interface ApplicationUrl {
     String USER = "/user/{id}";
     String POSTS = "/posts";
     String POST = "/post/{id}";
-    String USER_POSTS = "/posts/user/{userId}";
+    String USER_POSTS = "/posts/user";
     String AUTH_BASE_URL = "/api/v1/auth";
     String LOGIN = "/login";
 }

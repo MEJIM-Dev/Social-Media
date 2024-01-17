@@ -1,6 +1,7 @@
 package com.me.social.dto.request;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +14,6 @@ public class PostUpdateDTO {
 
     @NotBlank
     private String content;
+    @JsonIgnore
+    private long userId;
 }
