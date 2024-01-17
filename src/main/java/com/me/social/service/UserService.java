@@ -6,8 +6,6 @@ import com.me.social.dto.response.DefaultApiResponse;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
-    DefaultApiResponse<?> registration(RegistrationDTO registrationDTO);
-
     DefaultApiResponse<?> getUsers(Pageable pageable);
 
     DefaultApiResponse<?> getUser(Long id);

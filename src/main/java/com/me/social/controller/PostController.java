@@ -48,7 +48,7 @@ public class PostController {
         return postService.update(id,updateDTO);
     }
 
-    @PutMapping(ApplicationUrl.POST)
+    @DeleteMapping(ApplicationUrl.POST)
     public DefaultApiResponse<?> remove(@PathVariable Long id){
         log.debug("[+] Inside PostController.remove with id: {}",id);
         return postService.remove(id);

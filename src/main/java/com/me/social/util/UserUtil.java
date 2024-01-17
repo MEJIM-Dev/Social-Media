@@ -3,12 +3,20 @@ package com.me.social.util;
 import com.me.social.domain.User;
 import com.me.social.dto.request.RegistrationDTO;
 import com.me.social.dto.response.UserResponseDTO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class UserUtil {
+
+    private final PasswordEncoder passwordEncoder;
+
     public User dtoToUser(RegistrationDTO registrationDTO) {
         User user = new User();
         user.setActive(true);
@@ -18,7 +26,7 @@ public class UserUtil {
         user.setFirstName(registrationDTO.getFirstName());
         user.setLastName(registrationDTO.getLastName());
         user.setOtherNames(registrationDTO.getOtherNames());
-        user.setPassword(registrationDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         user.setProfilePicture(registrationDTO.getProfilePicture());
         user.setCreatedAt(Instant.now());
         return user;
@@ -36,5 +44,17 @@ public class UserUtil {
         responseDTO.setProfilePicture(user.getProfilePicture());
         responseDTO.setId(user.getId());
         return responseDTO;
+    }
+
+    public Map<String, Object> getExtraClaims(User user) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("email", user.getEmail());
+        extraClaims.put("sex", user.getSex());
+        extraClaims.put("firstname", user.getFirstName());
+        extraClaims.put("lastname", user.getLastName());
+        extraClaims.put("otherNames", user.getOtherNames());
+        extraClaims.put("username", user.getUsername());
+        extraClaims.put("profilePicture", user.getProfilePicture());
+        return extraClaims;
     }
 }

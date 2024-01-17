@@ -7,12 +7,18 @@ spring:
     username: root
     password: password
   jpa:
-    hibernate.ddl-auto: update
+    hibernate.ddl-auto: none
     show-sql: true
+
+logging.level.org.springframework.security: DEBUG
+logging.level.com: DEBUG
 
 app:
   users:
     maxPageSize: 100
   posts:
     maxPageSize: 50
+
+  jwt:
+    secret: "8c804c36256e93d041eaa691cfa46e94fa69637edab292f0878f770715619d89687bf5b982e77da2d73246b76ff36bbdb8b26933d5a5993ca144d8532f851a97"
 

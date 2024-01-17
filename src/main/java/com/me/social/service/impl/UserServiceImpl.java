@@ -37,29 +37,6 @@ public class UserServiceImpl implements UserService {
     private int maxUserPageSize;
 
     @Override
-    public DefaultApiResponse<?> registration(RegistrationDTO registrationDTO) {
-        DefaultApiResponse<?> apiResponse = new DefaultApiResponse<>();
-        apiResponse.setStatus(ExtendedConstants.ResponseCode.FAIL.getStatus());
-        apiResponse.setMessage(ExtendedConstants.ResponseCode.FAIL.getMessage());
-        try {
-            List<User> existingUsers = userRepository.findByUsernameOrEmail(registrationDTO.getUsername(), registrationDTO.getEmail());
-            if(!existingUsers.isEmpty()){
-                apiResponse.setMessage(ExtendedConstants.ResponseCode.DUPLICATE_RECORD.getMessage());
-                return apiResponse;
-            }
-
-            User user = userUtil.dtoToUser(registrationDTO);
-            user = userRepository.save(user);
-
-            apiResponse.setStatus(ExtendedConstants.ResponseCode.SUCCESS.getStatus());
-            apiResponse.setMessage(ExtendedConstants.ResponseCode.SUCCESS.getMessage());
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        return apiResponse;
-    }
-
-    @Override
     public DefaultApiResponse<?> getUsers(Pageable pageable) {
         DefaultApiResponse<Map> apiResponse = new DefaultApiResponse<>();
         apiResponse.setStatus(ExtendedConstants.ResponseCode.FAIL.getStatus());
