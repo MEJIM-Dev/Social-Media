@@ -3,6 +3,7 @@ package com.me.social.repository;
 import com.me.social.domain.User;
 import com.me.social.dto.domain.UserFollowersDTO;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,8 +18,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     List<User> findByUsernameOrEmail(String username, String email);
 
-    List<User> findByUsernameOrEmailAndDeleted(String username, String email, boolean deleted);
-
     Optional<User> findByIdAndDeleted(Long id, boolean deleted);
 
     Page<User> findByDeleted(boolean deleted, Pageable pageable);
@@ -26,9 +25,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByUsernameAndDeleted(String username, boolean deleted);
 
     Optional<User> findByEmail(String email);
-
-    @Query(value = "SELECT a.follower_id, a.following_id FROM user_followers a WHERE a.follower_id= :followerId",nativeQuery = true)
-    List<UserFollowersDTO> findUserFollowers(@Param("followerId") Long followerId);
 
     @Query(value = "SELECT COUNT(*) FROM user_followers a WHERE a.following_id = :followingId AND a.follower_id = :followerId", nativeQuery = true)
     Long followersCount(@Param("followerId") Long followerId, @Param("followingId") Long followingId);

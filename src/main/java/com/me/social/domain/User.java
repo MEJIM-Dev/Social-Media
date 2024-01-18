@@ -3,9 +3,7 @@ package com.me.social.domain;
 
 import com.me.social.domain.enumeration.Gender;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,6 +16,9 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class User {
 
     @Id

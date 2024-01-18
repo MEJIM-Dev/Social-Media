@@ -2,7 +2,6 @@ package com.me.social.service.impl;
 
 import com.me.social.config.ExtendedConstants;
 import com.me.social.domain.User;
-import com.me.social.dto.domain.UserFollowersDTO;
 import com.me.social.dto.request.FollowRequestDTO;
 import com.me.social.dto.request.UserUpdateRequestDTO;
 import com.me.social.dto.response.DefaultApiResponse;
@@ -20,7 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 
 @Service

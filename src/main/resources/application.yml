@@ -9,6 +9,15 @@ spring:
   jpa:
     hibernate.ddl-auto: update
     show-sql: true
+  mail:
+    host: sandbox.smtp.mailtrap.io
+    port: 2525
+    username: e9a64b4fa7f77f
+    password: 93d06803ea49c9
+    protocol: smtp
+    properties.mail.smtp:
+      auth: false
+      starttls.enable: true
 
 logging.level.org.springframework.security: DEBUG
 logging.level.com: INFO
