@@ -1,5 +1,6 @@
 package com.me.social.service;
 
+import com.me.social.dto.request.FollowRequestDTO;
 import com.me.social.dto.request.UserUpdateRequestDTO;
 import com.me.social.dto.response.DefaultApiResponse;
 import org.springframework.data.domain.Pageable;
@@ -12,4 +13,6 @@ public interface UserService {
     DefaultApiResponse<?> updateInformation(UserUpdateRequestDTO requestDTO, Long id, long loggedInUserId);
 
     DefaultApiResponse<?> deactivate(Long id, long loggedInUserId);
+
+    DefaultApiResponse<?> follow(FollowRequestDTO requestDTO);
 }

@@ -2,6 +2,7 @@ package com.me.social.controller;
 
 import com.me.social.config.ApplicationUrl;
 import com.me.social.dto.domain.UserDTO;
+import com.me.social.dto.request.FollowRequestDTO;
 import com.me.social.dto.request.RegistrationDTO;
 import com.me.social.dto.request.UserUpdateRequestDTO;
 import com.me.social.dto.response.DefaultApiResponse;
@@ -47,6 +48,14 @@ public class UserController {
         log.info("[+] Inside UserController.deactivate id: {}", id);
         UserDTO loggedInUser = userUtil.getLoggedInUserProfile();
         return userService.deactivate(id,loggedInUser.getId());
+    }
+
+    @PostMapping(ApplicationUrl.FOLLOW)
+    public DefaultApiResponse<?> follow(@Valid @RequestBody FollowRequestDTO requestDTO){
+        log.info("[+] Inside UserController.follow with dto: {}", requestDTO);
+        UserDTO loggedInUser = userUtil.getLoggedInUserProfile();
+        requestDTO.setFollowerId(loggedInUser.getId());
+        return userService.follow(requestDTO);
     }
 
 }

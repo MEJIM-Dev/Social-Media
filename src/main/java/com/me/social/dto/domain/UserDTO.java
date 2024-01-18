@@ -46,4 +46,6 @@ public class UserDTO {
     private Instant createdAt;
 
     private boolean deleted;
+
+    private long followersCount;
 }

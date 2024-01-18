@@ -20,4 +20,5 @@ public class UserResponseDTO {
     private Gender sex;
     private Instant createdAt;
     private Long id;
+    private Long followersCount;
 }

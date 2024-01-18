@@ -2,6 +2,8 @@ package com.me.social.service.impl;
 
 import com.me.social.config.ExtendedConstants;
 import com.me.social.domain.User;
+import com.me.social.dto.domain.UserFollowersDTO;
+import com.me.social.dto.request.FollowRequestDTO;
 import com.me.social.dto.request.UserUpdateRequestDTO;
 import com.me.social.dto.response.DefaultApiResponse;
 import com.me.social.dto.response.UserResponseDTO;
@@ -16,16 +18,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserUtil userUtil;
@@ -154,5 +155,64 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
         }
         return apiResponse;
+    }
+
+    @Override
+    public DefaultApiResponse<?> follow(FollowRequestDTO requestDTO) {
+        DefaultApiResponse<Object> apiResponse = new DefaultApiResponse<>();
+        apiResponse.setStatus(ExtendedConstants.ResponseCode.FAIL.getStatus());
+        apiResponse.setMessage(ExtendedConstants.ResponseCode.FAIL.getMessage());
+        try {
+            Long followerId = requestDTO.getFollowerId();
+            Long followingId = requestDTO.getFollowingId();
+            if(followerId.equals(followingId)){
+                apiResponse.setStatus(ExtendedConstants.ResponseCode.INVALID_ACTION.getStatus());
+                apiResponse.setMessage(ExtendedConstants.ResponseCode.INVALID_ACTION.getMessage());
+                return apiResponse;
+            }
+
+            Optional<User> optionalFollowerUser = userRepository.findByIdAndDeleted(followerId,false);
+            if(optionalFollowerUser.isEmpty()){
+                apiResponse.setStatus(ExtendedConstants.ResponseCode.INVALID_USER.getStatus());
+                apiResponse.setMessage(ExtendedConstants.ResponseCode.INVALID_USER.getMessage());
+                return apiResponse;
+            }
+            User followerUser = optionalFollowerUser.get();
+
+            Optional<User> optionalFollowingUser = userRepository.findByIdAndDeleted(followingId,false);
+            if(optionalFollowingUser.isEmpty()){
+                apiResponse.setStatus(ExtendedConstants.ResponseCode.USER_NOT_FOUND.getStatus());
+                apiResponse.setMessage(ExtendedConstants.ResponseCode.USER_NOT_FOUND.getMessage());
+                return apiResponse;
+            }
+
+            User followingUser = optionalFollowingUser.get();
+//            List<UserFollowersDTO> userFollowers = userRepository.findUserFollowers(followingUser.getId());
+            boolean alreadyFollowing = userRepository.isAlreadyFollowing(followerId, followingId);
+            long followersCount = followingUser.getFollowersCount();
+            if(alreadyFollowing){
+                unfollowUser(followingUser, followerUser);
+            } else{
+                followUser(followingUser, followerUser);
+            }
+
+            apiResponse.setStatus(ExtendedConstants.ResponseCode.SUCCESS.getStatus());
+            apiResponse.setMessage(ExtendedConstants.ResponseCode.SUCCESS.getMessage());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return apiResponse;
+    }
+
+    public void followUser(User following,User follower) {
+        follower.getFollowing().add(following);
+        following.setFollowersCount(following.getFollowersCount() + 1);
+        userRepository.saveAll(List.of(following,follower));
+    }
+
+    public void unfollowUser(User following,User follower) {
+        follower.getFollowing().remove(following);
+        following.setFollowersCount(following.getFollowersCount() - 1);
+        userRepository.saveAll(List.of(following,follower));
     }
 }
