@@ -5,6 +5,7 @@ import com.me.social.domain.Comment;
 import com.me.social.domain.Post;
 import com.me.social.domain.PostReaction;
 import com.me.social.domain.User;
+import com.me.social.dto.notification.NotificationDto;
 import com.me.social.dto.request.CreatePostDTO;
 import com.me.social.dto.request.PostUpdateDTO;
 import com.me.social.dto.response.CommentResponseDTO;
@@ -14,6 +15,7 @@ import com.me.social.repository.CommentRepository;
 import com.me.social.repository.PostReactionRepository;
 import com.me.social.repository.PostRepository;
 import com.me.social.repository.UserRepository;
+import com.me.social.service.NotificationService;
 import com.me.social.service.PostService;
 import com.me.social.util.CommentUtil;
 import com.me.social.util.PostUtil;
@@ -56,6 +58,8 @@ public class PostServiceImpl implements PostService {
 
     private final CommentUtil commentUtil;
 
+    private final NotificationService notificationService;
+
     @Override
     public DefaultApiResponse<?> create(CreatePostDTO postDto) {
         var apiResponse = new DefaultApiResponse<>();
@@ -75,6 +79,8 @@ public class PostServiceImpl implements PostService {
             post.setLikesCount(0);
             post.setUser(optionalUser.get());
             postRepository.save(post);
+
+            notificationService.sendNewPostNotification(post);
 
             apiResponse.setStatus(ExtendedConstants.ResponseCode.SUCCESS.getStatus());
             apiResponse.setMessage(ExtendedConstants.ResponseCode.SUCCESS.getMessage());
@@ -258,11 +264,15 @@ public class PostServiceImpl implements PostService {
 
             Optional<PostReaction> byPostAndUser = reactionRepository.findByPostAndUser(post, user);
             if(byPostAndUser.isEmpty()){
+                likesCount++;
                 PostReaction postReaction = new PostReaction();
                 postReaction.setPost(post);
                 postReaction.setUser(user);
                 reactionRepository.save(postReaction);
-                likesCount++;
+                if(! (user.getId()==post.getUser().getId()) ) {
+                    NotificationDto notificationDto = postUtil.generateLikeNotificationDto(post, user);
+                    notificationService.sendLikeNotification(notificationDto);
+                }
             } else {
                 likesCount--;
                 reactionRepository.delete(byPostAndUser.get());

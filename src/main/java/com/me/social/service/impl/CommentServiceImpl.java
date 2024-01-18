@@ -4,6 +4,7 @@ import com.me.social.config.ExtendedConstants;
 import com.me.social.domain.Comment;
 import com.me.social.domain.Post;
 import com.me.social.domain.User;
+import com.me.social.dto.notification.NotificationDto;
 import com.me.social.dto.request.CommentRequest;
 import com.me.social.dto.request.CommentUpdateDTO;
 import com.me.social.dto.response.CommentResponseDTO;
@@ -12,6 +13,7 @@ import com.me.social.repository.CommentRepository;
 import com.me.social.repository.PostRepository;
 import com.me.social.repository.UserRepository;
 import com.me.social.service.CommentService;
+import com.me.social.service.NotificationService;
 import com.me.social.util.CommentUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +47,8 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentUtil commentUtil;
 
+    private final NotificationService notificationService;
+
     @Override
     public DefaultApiResponse<?> create(CommentRequest commentRequest) {
         var apiResponse = new DefaultApiResponse<>();
@@ -64,14 +68,21 @@ public class CommentServiceImpl implements CommentService {
                 apiResponse.setMessage(ExtendedConstants.ResponseCode.INVALID_POST.getMessage());
                 return apiResponse;
             }
+            Post post = optionalPost.get();
+            User user = optionalUser.get();
 
             Comment comment = new Comment();
             comment.setContent(commentRequest.getComment());
             comment.setDeleted(false);
-            comment.setUser(optionalUser.get());
-            comment.setPost(optionalPost.get());
+            comment.setUser(user);
+            comment.setPost(post);
             comment.setCreationDate(Instant.now());
             commentRepository.save(comment);
+
+            if(! (post.getUser().getId()==user.getId()) ) {
+                NotificationDto notificationDto = commentUtil.generateNewCommentNotificationDto(comment, user, post);
+                notificationService.sendNewCommentNotification(notificationDto);
+            }
 
             apiResponse.setStatus(ExtendedConstants.ResponseCode.SUCCESS.getStatus());
             apiResponse.setMessage(ExtendedConstants.ResponseCode.SUCCESS.getMessage());
