@@ -14,6 +14,8 @@ public class ExtendedConstants {
         INVALID_POST("93","Invalid Post"),
         UNAUTHORIZED("92","Unauthorized Request"),
         ALREADY_IN_USE("91","%s Already In Use"),
+        INVALID_ACTION("90","Invalid Action"),
+        INVALID_COMMENT("89","Invalid Comment"),
         ;
 
         ResponseCode(String status,String message){

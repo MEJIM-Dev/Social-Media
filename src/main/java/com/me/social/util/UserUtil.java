@@ -39,6 +39,7 @@ public class UserUtil {
         user.setOtherNames(registrationDTO.getOtherNames());
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         user.setProfilePicture(registrationDTO.getProfilePicture());
+        user.setFollowersCount(0);
         user.setCreatedAt(Instant.now());
         return user;
     }
@@ -54,6 +55,7 @@ public class UserUtil {
         responseDTO.setOtherNames(user.getOtherNames());
         responseDTO.setProfilePicture(user.getProfilePicture());
         responseDTO.setId(user.getId());
+        responseDTO.setFollowersCount(user.getFollowersCount());
         return responseDTO;
     }
 

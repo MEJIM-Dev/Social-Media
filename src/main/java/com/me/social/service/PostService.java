@@ -18,4 +18,8 @@ public interface PostService {
     DefaultApiResponse<?> update(Long id, PostUpdateDTO updateDTO);
 
     DefaultApiResponse<?> remove(Long id, long loggedInUserProfileId);
+
+    DefaultApiResponse<?> reactToPost(Long id, long userId);
+
+    DefaultApiResponse<?> getComments(Long id,Pageable pageable);
 }

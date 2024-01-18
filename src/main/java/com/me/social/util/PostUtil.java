@@ -14,6 +14,8 @@ public class PostUtil {
         responseDTO.setCreationDate(post.getCreationDate());
         responseDTO.setDeleted(post.isDeleted());
         responseDTO.setLikesCount(post.getLikesCount());
+        responseDTO.setUserId(post.getUser().getId());
+        responseDTO.setComments(post.getComments().size());
         return responseDTO;
     }
 }

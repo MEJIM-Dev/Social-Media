@@ -68,4 +68,7 @@ public class User {
     @Column(nullable = false)
     private boolean deleted;
 
+    @Column(nullable = false)
+    private long followersCount;
+
 }
