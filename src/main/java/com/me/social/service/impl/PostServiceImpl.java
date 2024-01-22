@@ -80,8 +80,6 @@ public class PostServiceImpl implements PostService {
             post.setUser(optionalUser.get());
             postRepository.save(post);
 
-            notificationService.sendNewPostNotification(post);
-
             apiResponse.setStatus(ExtendedConstants.ResponseCode.SUCCESS.getStatus());
             apiResponse.setMessage(ExtendedConstants.ResponseCode.SUCCESS.getMessage());
         } catch (Exception e){
