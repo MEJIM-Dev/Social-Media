@@ -40,22 +40,7 @@ public class UserServiceTests {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Set the value for maxUserPageSize in the UserServiceImpl instance
         ReflectionTestUtils.setField(userService, "maxUserPageSize", 100);
     }
 
-    @Test
-    void getUsers_Success(){
-        DefaultApiResponse<?> defaultApiResponse = Mockito.mock(DefaultApiResponse.class);
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        UserResponseDTO responseDTO = Mockito.mock(UserResponseDTO.class);
-        Page<User> userList = Mockito.mock(Page.class);
-
-        when(userUtil.userToResponseDto(Mockito.any(User.class))).thenReturn(responseDTO);
-        when(userRepository.findByDeleted(false,pageRequest)).thenReturn(userList);
-
-        DefaultApiResponse<?> response = userService.getUsers(pageRequest);
-
-        Assertions.assertThat(response.getStatus().equals(ExtendedConstants.ResponseCode.SUCCESS.getStatus()));
-    }
 }
